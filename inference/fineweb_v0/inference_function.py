@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch.amp import autocast
+
 device = "cuda"
 
 
@@ -16,10 +17,11 @@ def inference(
         max_gen_length: int = 1050,
         max_context_length: int = 1024,
 ):
+    time_to_enter, original_time_to_enter = 25, 25
     model.eval()
     generated = tokenizer.encode(input_text)
 
-    print(input_text, end="", flush=True)
+    print(input_text, end="")
 
     with autocast("cuda"), torch.no_grad():
         for _ in range(max_gen_length):
@@ -63,7 +65,12 @@ def inference(
                 next_token_id = torch.multinomial(probability_dist, num_samples=1).item()
 
             token_str = tokenizer.decode([next_token_id], skip_special_tokens=False)
-            print(token_str, end="", flush=True)
+            print(token_str, end="")
+            if time_to_enter == 0:
+                print()
+                time_to_enter = original_time_to_enter
+            else:
+                time_to_enter -= 1
 
             generated.append(next_token_id)
             if next_token_id == tokenizer.eos_token_id:
