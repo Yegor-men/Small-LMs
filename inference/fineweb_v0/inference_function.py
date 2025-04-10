@@ -17,7 +17,7 @@ def inference(
         max_gen_length: int = 1050,
         max_context_length: int = 1024,
 ):
-    time_to_enter, original_time_to_enter = 25, 25
+    time_to_enter, original_time_to_enter = 20, 20
     model.eval()
     generated = tokenizer.encode(input_text)
 

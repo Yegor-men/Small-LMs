@@ -6,9 +6,9 @@ import torch
 tokenizer = AutoTokenizer.from_pretrained("saved_models/tokenizers/fineweb/fineweb_v0")
 
 EMBED_DIM = 768
-NUM_HEADS = 4
-NUM_BLOCKS = 4
-MAX_SEQ_LENGTH = 512
+NUM_HEADS = 12
+NUM_BLOCKS = 12
+MAX_SEQ_LENGTH = 1024
 VOCAB_SIZE = len(tokenizer.get_vocab())
 
 model = arch.GPTModel(
@@ -20,7 +20,14 @@ model = arch.GPTModel(
     tokenizer=tokenizer,
     dropout=0.0,
 ).to("cuda")
-model.load_state_dict(torch.load("saved_models/models/fineweb_v0/E7-20250410_0008", weights_only=True))
+
+ckpt = torch.load("saved_models/models/fineweb_v0/S00000-L15.4787-E11.6345-20250410_1142.pt")
+model.load_state_dict(ckpt["model_state_dict"])
+# optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+# scheduler.load_state_dict(ckpt["scheduler_state_dict"])
+# scaler.load_state_dict(ckpt["scaler_state_dict"])
+# start_step = ckpt["step"]
+
 model.eval()
 
 input_text = "Once upon a time, there was a fantastic cat that"
@@ -29,7 +36,7 @@ inference(
     model,
     tokenizer,
     input_text,
-    sample=False,
+    sample=True,
     temperature=1.0,
     top_p=0.9,
     top_k=50,
