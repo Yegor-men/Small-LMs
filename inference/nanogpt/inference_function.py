@@ -10,12 +10,12 @@ def inference(
         tokenizer,
         input_text: str,
         sample: bool = False,
-        temperature: float = 1.0,
+        temperature: float = 0.7,
         top_p: float = 0.9,
         top_k: int = 50,
         repetition_penalty: float = 1.2,
-        max_gen_length: int = 1050,
-        max_context_length: int = 1024,
+        max_gen_length: int = 1000,
+        max_context_length: int = 512,
 ):
     time_to_enter, original_time_to_enter = 20, 20
     model.eval()

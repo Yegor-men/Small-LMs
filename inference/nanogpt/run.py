@@ -1,14 +1,14 @@
-from inference.fineweb_v0 import architecture as arch
-from inference.fineweb_v0.inference_function import inference
+from inference.nanogpt import architecture as arch
+from inference.nanogpt.inference_function import inference
 from transformers import AutoTokenizer
 import torch
 
-tokenizer = AutoTokenizer.from_pretrained("saved_models/tokenizers/fineweb/fineweb_v0")
+tokenizer = AutoTokenizer.from_pretrained("saved_models/tokenizers/nanogpt/nanogpt")
 
-EMBED_DIM = 768
-NUM_HEADS = 12
-NUM_BLOCKS = 12
-MAX_SEQ_LENGTH = 1024
+EMBED_DIM = 512
+NUM_HEADS = 8
+NUM_BLOCKS = 18
+MAX_SEQ_LENGTH = 512
 VOCAB_SIZE = len(tokenizer.get_vocab())
 
 model = arch.GPTModel(
@@ -21,7 +21,7 @@ model = arch.GPTModel(
     dropout=0.0,
 ).to("cuda")
 
-ckpt = torch.load("saved_models/models/fineweb_v0/S02999-L8.6010-E7.6798-20250411_0806.pt")
+ckpt = torch.load("saved_models/models/nanogpt/nanogpt-S03600-L12.5971-E13.9301-20250412_2003.pt")
 model.load_state_dict(ckpt["model_state_dict"])
 # optimizer.load_state_dict(ckpt["optimizer_state_dict"])
 # scheduler.load_state_dict(ckpt["scheduler_state_dict"])
@@ -37,10 +37,10 @@ inference(
     tokenizer,
     input_text,
     sample=True,
-    temperature=1.0,
+    temperature=0.7,
     top_p=0.9,
     top_k=50,
     repetition_penalty=1.2,
-    max_gen_length=1050,
+    max_gen_length=700,
     max_context_length=MAX_SEQ_LENGTH,
 )

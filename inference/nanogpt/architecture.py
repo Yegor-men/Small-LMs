@@ -1,28 +1,30 @@
-# The architecture for the model, running is in the other file
-
 import torch
 from torch import nn
 import inspect
 import logging
 from transformers import PreTrainedTokenizerFast
 from torch.nn.utils import clip_grad_norm_
-from transformers import get_cosine_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
 from torch.amp import autocast, GradScaler
 from datasets import load_dataset
 from transformers import AutoTokenizer, DataCollatorForLanguageModeling
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-)
+import logging
+import matplotlib
+
+logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format='%(asctime)s - %(levelname)s - %(message)s',
+# )
 
 torch.manual_seed(0)
 torch.cuda.manual_seed_all(0)
 
 device = "cuda"
-
 
 class CasualMaskedDecoderBlocks(nn.Module):
     def __init__(
@@ -94,7 +96,6 @@ class CasualMaskedDecoderBlocks(nn.Module):
 
         return tok_seq
 
-
 class AttendedTokenDecoder(nn.Module):
     def __init__(
             self,
@@ -128,7 +129,6 @@ class AttendedTokenDecoder(nn.Module):
         token_logits = self.decoder(att_tok_seq)
 
         return token_logits
-
 
 class GPTModel(nn.Module):
     def __init__(
@@ -185,6 +185,20 @@ class GPTModel(nn.Module):
             vocabulary_size=vocab_size,
         )
 
+        self.final_ln = nn.LayerNorm(embed_dim)
+
+        self.apply(self._init_weights)
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if hasattr(module, 'padding_idx') and module.padding_idx is not None:
+                nn.init.zeros_(module.weight[module.padding_idx])
+
     def forward(self, tokenized_sequence):
         """
         :param tokenized_sequence:
@@ -206,7 +220,7 @@ class GPTModel(nn.Module):
         sequence = embedded_sequence + positional_embeddings
 
         sequence = self.decoder_blocks(sequence, padding_mask)
-
+        sequence = self.final_ln(sequence)
         logits = self.decoder(sequence)
 
         return logits
