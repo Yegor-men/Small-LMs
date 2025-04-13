@@ -1,6 +1,3 @@
- 
-## Import statements
-
 import torch
 from torch import nn
 import inspect
@@ -28,8 +25,7 @@ torch.manual_seed(0)
 torch.cuda.manual_seed_all(0)
 
 device = "cuda"
- 
-## Decoder block architecture
+
 
 class CasualMaskedDecoderBlocks(nn.Module):
     def __init__(
@@ -100,8 +96,7 @@ class CasualMaskedDecoderBlocks(nn.Module):
             )
 
         return tok_seq
- 
-## Attended token decoder
+
 
 class AttendedTokenDecoder(nn.Module):
     def __init__(
@@ -136,8 +131,7 @@ class AttendedTokenDecoder(nn.Module):
         token_logits = self.decoder(att_tok_seq)
 
         return token_logits
- 
-## Combined GPT model
+
 
 class GPTModel(nn.Module):
     def __init__(
@@ -233,16 +227,15 @@ class GPTModel(nn.Module):
         logits = self.decoder(sequence)
 
         return logits
- 
-## Initialization
 
-tokenizer_model_path = "../../../saved_models/tokenizers/nanogpt/nanogpt"
+
+tokenizer_model_path = "New/minigpt/saved/tokenizer"
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_model_path)
 
-EMBED_DIM = 512
-NUM_HEADS = 8
-NUM_BLOCKS = 18
-MAX_SEQ_LENGTH = 512
+EMBED_DIM = 1024
+NUM_HEADS = 12
+NUM_BLOCKS = 12
+MAX_SEQ_LENGTH = 1024
 VOCAB_SIZE = len(tokenizer.get_vocab())
 
 model = GPTModel(
@@ -260,8 +253,6 @@ trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 print(f"Total: {total_params:,}")
 print(f"Trainable: {total_params:,}")
- 
-## Data loading
 
 import duckdb
 import torch
@@ -366,7 +357,7 @@ SAMPLES_PE = 320
 
 # 2) Datasets
 train_ds = ChunkedFineWebDataset(
-    db_path="../../../../New/data/fineweb/fineweb.db",
+    db_path="New/data/fineweb/fineweb.db",
     tokenizer=tokenizer,
     split="train",
     samples_per_epoch=SAMPLES_PE,
@@ -375,7 +366,7 @@ train_ds = ChunkedFineWebDataset(
     stride=256
 )
 val_ds = ChunkedFineWebDataset(
-    db_path="../../../../New/data/fineweb/fineweb.db",
+    db_path="New/data/fineweb/fineweb.db",
     tokenizer=tokenizer,
     split="val",
     samples_per_epoch=SAMPLES_PE,  # smaller val
@@ -390,8 +381,6 @@ collator = ChunkedCollator(pad_token_id=tokenizer.pad_token_id)
 # 4) DataLoaders
 train_dataloader = DataLoader(train_ds, batch_size=BATCH_SIZE, collate_fn=collator)
 valid_dataloader = DataLoader(val_ds, batch_size=BATCH_SIZE, collate_fn=collator)
- 
-## How to save stuff
 
 from datetime import datetime
 import torch
@@ -408,12 +397,10 @@ def save_checkpoint(step, avg_loss, avg_entropy):
         "entropy": avg_entropy,
     }
     ts = datetime.now().strftime("%Y%m%d_%H%M")
-    fname = f"../../../saved_models/models/nanogpt/nanogpt-S{step + 1:05d}-L{avg_loss:.4f}-E{avg_entropy:.4f}-{ts}.pt"
+    fname = f"New/minigpt/saved/model/minigpt-S{step + 1:05d}-L{avg_loss:.4f}-E{avg_entropy:.4f}-{ts}.pt"
     torch.save(ckpt, fname)
     print(f"Saved checkpoint to {fname}")
 
- 
-## Training loop
 
 import torch.nn.functional as F
 from torch.distributions import Categorical
@@ -446,8 +433,8 @@ optimizer.zero_grad()
 
 """This stuff for resuming training if I stop it"""
 
-ckpt = torch.load("../../../saved_models/models/nanogpt/nanogpt-S03600-L12.5971-E13.9301-20250412_2003.pt")
-model.load_state_dict(ckpt["model_state_dict"])
+# ckpt = torch.load("New/minigpt/saved/model/")
+# model.load_state_dict(ckpt["model_state_dict"])
 # optimizer.load_state_dict(ckpt["optimizer_state_dict"])
 # scheduler.load_state_dict(ckpt["scheduler_state_dict"])
 # scaler.load_state_dict(ckpt["scaler_state_dict"])

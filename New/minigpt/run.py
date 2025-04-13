@@ -1,14 +1,14 @@
-from Legacy.inference.nanogpt import architecture as arch
-from Legacy.inference.nanogpt.inference_function import inference
+from New.minigpt import train as arch
+from New.minigpt.inference_function import inference
 from transformers import AutoTokenizer
 import torch
 
-tokenizer = AutoTokenizer.from_pretrained("saved_models/tokenizers/nanogpt/nanogpt")
+tokenizer = AutoTokenizer.from_pretrained("New/minigpt/saved/tokenizer")
 
-EMBED_DIM = 512
-NUM_HEADS = 8
-NUM_BLOCKS = 18
-MAX_SEQ_LENGTH = 512
+EMBED_DIM = 1024
+NUM_HEADS = 12
+NUM_BLOCKS = 12
+MAX_SEQ_LENGTH = 1024
 VOCAB_SIZE = len(tokenizer.get_vocab())
 
 model = arch.GPTModel(
@@ -21,7 +21,7 @@ model = arch.GPTModel(
     dropout=0.0,
 ).to("cuda")
 
-ckpt = torch.load("saved_models/models/nanogpt/nanogpt-S03600-L12.5971-E13.9301-20250412_2003.pt")
+ckpt = torch.load("New/minigpt/saved/model")
 model.load_state_dict(ckpt["model_state_dict"])
 # optimizer.load_state_dict(ckpt["optimizer_state_dict"])
 # scheduler.load_state_dict(ckpt["scheduler_state_dict"])
