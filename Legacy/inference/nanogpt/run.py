@@ -1,5 +1,5 @@
-from inference.nanogpt import architecture as arch
-from inference.nanogpt.inference_function import inference
+from Legacy.inference.nanogpt import architecture as arch
+from Legacy.inference.nanogpt.inference_function import inference
 from transformers import AutoTokenizer
 import torch
 

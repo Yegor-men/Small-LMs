@@ -1,2 +1,3 @@
-training/data/fineweb/fineweb.db
-saved_models/
+New/data/fineweb/fineweb.db
+Legacy/saved_models/
+New/minigpt/saved/
