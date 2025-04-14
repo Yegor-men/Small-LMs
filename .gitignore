@@ -1,3 +1,5 @@
 New/data/fineweb/fineweb.db
 Legacy/saved_models/
-New/minigpt/saved/
+new/minigpt/saved/
+new/minigpt/__pycache__/
+new/data/

@@ -229,13 +229,13 @@ class GPTModel(nn.Module):
         return logits
 
 
-tokenizer_model_path = "New/minigpt/saved/tokenizer"
+tokenizer_model_path = "new/minigpt/saved/tokenizer"
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_model_path)
 
-EMBED_DIM = 1024
-NUM_HEADS = 12
-NUM_BLOCKS = 12
-MAX_SEQ_LENGTH = 1024
+EMBED_DIM = 90
+NUM_HEADS = 1
+NUM_BLOCKS = 8
+MAX_SEQ_LENGTH = 512
 VOCAB_SIZE = len(tokenizer.get_vocab())
 
 model = GPTModel(
@@ -352,12 +352,12 @@ class ChunkedCollator:
 
 from torch.utils.data import DataLoader
 
-BATCH_SIZE = 16
-SAMPLES_PE = 320
+BATCH_SIZE = 45
+SAMPLES_PE = 630
 
 # 2) Datasets
 train_ds = ChunkedFineWebDataset(
-    db_path="New/data/fineweb/fineweb.db",
+    db_path="new/data/fineweb/fineweb.db",
     tokenizer=tokenizer,
     split="train",
     samples_per_epoch=SAMPLES_PE,
@@ -366,7 +366,7 @@ train_ds = ChunkedFineWebDataset(
     stride=256
 )
 val_ds = ChunkedFineWebDataset(
-    db_path="New/data/fineweb/fineweb.db",
+    db_path="new/data/fineweb/fineweb.db",
     tokenizer=tokenizer,
     split="val",
     samples_per_epoch=SAMPLES_PE,  # smaller val
@@ -397,7 +397,7 @@ def save_checkpoint(step, avg_loss, avg_entropy):
         "entropy": avg_entropy,
     }
     ts = datetime.now().strftime("%Y%m%d_%H%M")
-    fname = f"New/minigpt/saved/model/minigpt-S{step + 1:05d}-L{avg_loss:.4f}-E{avg_entropy:.4f}-{ts}.pt"
+    fname = f"new/minigpt/saved/model/tinygpt-S{step + 1:05d}-L{avg_loss:.4f}-E{avg_entropy:.4f}-{ts}.pt"
     torch.save(ckpt, fname)
     print(f"Saved checkpoint to {fname}")
 
@@ -405,8 +405,8 @@ def save_checkpoint(step, avg_loss, avg_entropy):
 import torch.nn.functional as F
 from torch.distributions import Categorical
 
-NUM_EPOCHS = 10_000
-LEARNING_RATE = 1e-4
+NUM_EPOCHS = 1_000
+LEARNING_RATE = 1e-3
 
 scaler = GradScaler()
 loss_fn = nn.CrossEntropyLoss()
@@ -433,7 +433,7 @@ optimizer.zero_grad()
 
 """This stuff for resuming training if I stop it"""
 
-# ckpt = torch.load("New/minigpt/saved/model/")
+# ckpt = torch.load("new/minigpt/saved/model/minigpt-S06000-L5.1952-E6.6401-20250414_1007.pt")
 # model.load_state_dict(ckpt["model_state_dict"])
 # optimizer.load_state_dict(ckpt["optimizer_state_dict"])
 # scheduler.load_state_dict(ckpt["scheduler_state_dict"])

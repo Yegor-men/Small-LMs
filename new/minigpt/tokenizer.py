@@ -15,7 +15,7 @@ from typing import Iterator, List, Optional
 
 
 def get_training_corpus(
-        db_path: str = "New/data/fineweb/fineweb.db",
+        db_path: str = "new/data/fineweb/fineweb.db",
         batch_size: int = 1_000,
         max_entries: Optional[int] = None
 ) -> Iterator[List[str]]:
@@ -51,7 +51,7 @@ special_tokens = ["<eos>", "<pad>", "<unk>", "<model>", "</model>", "<user>", "<
                   "<think>", "</think>", ]
 total = len(special_tokens) + 50_000
 trainer = trainers.BpeTrainer(
-    vocab_size=300,
+    vocab_size=512,
     special_tokens=special_tokens,
     initial_alphabet=pre_tokenizers.ByteLevel.alphabet()
 )
@@ -76,9 +76,9 @@ wrapped_tokenizer = PreTrainedTokenizerFast(
     # mask_token="[MASK]",
 )
 
-wrapped_tokenizer.save_pretrained("New/minigpt/saved/tokenizer")
+wrapped_tokenizer.save_pretrained("new/minigpt/saved/tokenizer")
 
-tok = AutoTokenizer.from_pretrained("New/minigpt/saved/tokenizer")
+tok = AutoTokenizer.from_pretrained("new/minigpt/saved/tokenizer")
 
 tokens = tok.tokenize("Test number 2.!@#$%^&*() Yohoho skibidi biden <think></think><eos>")
 
