@@ -145,6 +145,8 @@ class TokenEmbedding(nn.Module):
             num_embeddings=vocab_size,
             embedding_dim=embed_dim,
         )
+        
+        self.token_norm = nn.LayerNorm(embed_dim)
 
         frequencies = 1.0 / (
             base ** (torch.arange(0, embed_dim, 2).float() / embed_dim)
@@ -186,7 +188,7 @@ class TokenEmbedding(nn.Module):
             -2
         )  # [batch, seq_len, dim]
 
-        return x_rotated
+        return self.token_norm(x_rotated)
 
 
 class DenseDecoder(nn.Module):
