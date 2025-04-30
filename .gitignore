@@ -3,3 +3,5 @@ data/fineweb/fineweb.db
 Legacy/saved_models/
 new/minigpt/saved/
 new/minigpt2/saved/
+new/denseGPT/saved/
+new/denseGPT/__pycache__/

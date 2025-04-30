@@ -225,15 +225,6 @@ class DenseGPT(nn.Module):
             base=10000,
         )
 
-        dt = DenseTransformer(
-            embed_dim=embed_dim,
-            num_heads=num_heads,
-        )
-
-        dc = DenseCompressor(
-            embed_dim=embed_dim,
-        )
-
         self.DTs = nn.ModuleList(
             [
                 DenseTransformer(
@@ -247,7 +238,6 @@ class DenseGPT(nn.Module):
             [
                 DenseCompressor(
                     embed_dim=embed_dim,
-                    num_heads=num_heads,
                 )
                 for _ in range(num_blocks)
             ]
